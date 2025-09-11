@@ -1,0 +1,8 @@
+cff-version: 1.2.0
+title: "Adaptive Adversarial Looping: Learning Under Attack"
+authors:
+  - family-names: "Contributors"
+    given-names: "AAL"
+version: "0.1.0"
+date-released: "2025-09-08"
+message: "If you use this software, please cite it using this metadata."
