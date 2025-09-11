@@ -13,6 +13,8 @@ Instead of one-shot red teaming, AAL measures how models and defenses learn unde
 
 ## Quick start
 
+AAL supports Python 3.10–3.13. Continuous integration tests run on Ubuntu and on Windows using Git Bash.
+
 ```bash
 python -m venv .venv && . .venv/bin/activate
 pip install -U pip pytest
