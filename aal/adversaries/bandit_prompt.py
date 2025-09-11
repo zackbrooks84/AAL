@@ -18,13 +18,23 @@ class BanditAdversary(AdversaryBase):
         self.beta = {k: 1.0 for k, _ in OPS}
 
     def choose_op(self, history: List[Any]) -> str:
-        samples = []
+        """Select the next operator via Thompson sampling.
+
+        The previous implementation used a crude heuristic that added a small
+        amount of noise around the mean of the Beta distribution.  This caused
+        large regret in stochastic simulations and did not faithfully sample
+        from the posterior.  We now draw a true sample from ``Beta(alpha, beta)``
+        using ``random.betavariate`` which yields a much stronger exploration /
+        exploitation balance.
+        """
+
+        samples: List[Tuple[float, str]] = []
         for k, _ in OPS:
             a, b = self.alpha[k], self.beta[k]
-            # simple Beta sampler using rng.random approximation via inverse-cdf for demonstration
-            # fallback to heuristic sample = a/(a+b) + small noise
-            sample = a / (a + b) + (self.rng.random() - 0.5) * 0.05
+            # Thompson sampling via proper Beta draw
+            sample = self.rng.betavariate(a, b)
             samples.append((sample, k))
+
         samples.sort(reverse=True)
         return samples[0][1]
 
@@ -38,4 +48,13 @@ class BanditAdversary(AdversaryBase):
         self.beta[op] += max(0.0, 1.0 - reward)
 
     def state_snapshot(self) -> Dict[str, Any]:
-        return {"alpha": self.alpha, "beta": self.beta}
+        """Return a copy of the current posterior parameters.
+
+        Returning the internal dictionaries directly meant any subsequent
+        updates mutated previously captured snapshots.  Tests that asserted the
+        state evolved monotonically therefore observed inconsistent values.  By
+        copying the dictionaries we provide an immutable snapshot of the
+        current state.
+        """
+
+        return {"alpha": dict(self.alpha), "beta": dict(self.beta)}
