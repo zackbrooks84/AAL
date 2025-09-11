@@ -1,0 +1,4 @@
+rounds: 20
+adversary: bandit
+defender: self_reflect
+model: dummy
