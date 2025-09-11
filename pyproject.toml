@@ -1,0 +1,11 @@
+[project]
+name = "aal"
+version = "0.1.0"
+description = "Adaptive Adversarial Looping - learning under attack"
+authors = [{name = "AAL Contributors"}]
+readme = "README.md"
+requires-python = ">=3.10"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
