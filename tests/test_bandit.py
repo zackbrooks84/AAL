@@ -174,8 +174,13 @@ def test_bandit_identifies_best_arm_and_minimizes_regret():
         "role_confusion": 0.45,   # best arm
         "encoding_noise": 0.28,
         "flattery_anchor": 0.25,
+        "persona_hijack": 0.20,
+        "nested_roleplay": 0.18,
+        "authority_escalation": 0.22,
+        "context_overflow": 0.15,
+        "hypothetical_frame": 0.19,
     }
-    rounds = 1000
+    rounds = 1500
     b, history, counts = run_bandit_sim(rounds, probs, seed=1337)
 
     # Best arm should be pulled most frequently
@@ -183,11 +188,12 @@ def test_bandit_identifies_best_arm_and_minimizes_regret():
     most_pulled = max(counts, key=counts.get)
     assert most_pulled == best, f"Expected best={best}, got {most_pulled}"
 
-    # Cumulative regret should be less than 20 percent of uniform baseline
+    # Cumulative regret should be less than 30 percent of uniform baseline
+    # (threshold relaxed from 0.2 → 0.3 to account for larger 9-arm search space)
     p_star = probs[best]
     regret = sum((p_star - probs[op]) for op, _ in history)
     uniform_expected = sum((p_star - probs[op]) for op in probs) / len(probs) * rounds
-    assert regret < 0.2 * uniform_expected, f"Regret {regret:.2f} vs {uniform_expected:.2f}"
+    assert regret < 0.3 * uniform_expected, f"Regret {regret:.2f} vs {uniform_expected:.2f}"
 
 
 def test_posterior_means_track_empirical_rates():
@@ -200,6 +206,11 @@ def test_posterior_means_track_empirical_rates():
         "role_confusion": 0.25,
         "encoding_noise": 0.35,
         "flattery_anchor": 0.55,
+        "persona_hijack": 0.20,
+        "nested_roleplay": 0.18,
+        "authority_escalation": 0.22,
+        "context_overflow": 0.12,
+        "hypothetical_frame": 0.30,
     }
     rounds = 2000
     b, history, counts = run_bandit_sim(rounds, probs, seed=2025)
@@ -229,8 +240,13 @@ def test_exploration_then_concentration():
         "role_confusion": 0.20,
         "encoding_noise": 0.60,  # best arm
         "flattery_anchor": 0.15,
+        "persona_hijack": 0.12,
+        "nested_roleplay": 0.11,
+        "authority_escalation": 0.14,
+        "context_overflow": 0.09,
+        "hypothetical_frame": 0.13,
     }
-    rounds = 800
+    rounds = 1200
     b, history, counts = run_bandit_sim(rounds, probs, seed=9)
 
     best = "encoding_noise"

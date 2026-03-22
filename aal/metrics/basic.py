@@ -71,3 +71,61 @@ def resilience_half_life(history: List[Step]) -> int | None:
             return idx + 1  # convert to 1-indexed round number
 
     return None
+
+
+def defense_delta(history: List[Step], halves: int = 2) -> float:
+    """Measure how much the defender improved across the run.
+
+    Splits the history into equal halves and computes the change in
+    adversary success rate from the first half to the last half.  A
+    *negative* delta means the defender improved (fewer breaches later);
+    a *positive* delta means it got worse.
+
+    Parameters
+    ----------
+    history:
+        Ordered sequence of :class:`~aal.core.types.Step` objects.
+    halves:
+        Number of segments to split the history into.  The delta is
+        measured between the first and last segment.
+
+    Returns
+    -------
+    float
+        ``last_half_rate - first_half_rate``.  ``0.0`` for histories
+        too short to split.
+    """
+    n = len(history)
+    if n < halves * 2:
+        return 0.0
+
+    seg = n // halves
+    first = history[:seg]
+    last = history[n - seg:]
+
+    first_rate = sum(1 for s in first if s.success) / seg
+    last_rate = sum(1 for s in last if s.success) / seg
+    return last_rate - first_rate
+
+
+def learning_curve(history: List[Step], window: int = 5) -> List[float]:
+    """Rolling success rate across the run.
+
+    Parameters
+    ----------
+    history:
+        Ordered sequence of :class:`~aal.core.types.Step` objects.
+    window:
+        Rolling window size.
+
+    Returns
+    -------
+    list of float
+        One rate per step (using a trailing window).
+    """
+    rates = []
+    for i, _ in enumerate(history):
+        start = max(0, i - window + 1)
+        chunk = history[start : i + 1]
+        rates.append(sum(1 for s in chunk if s.success) / len(chunk))
+    return rates
