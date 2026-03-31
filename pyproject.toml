@@ -24,3 +24,6 @@ claude = ["anthropic"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = [
+  "flaky: mark test as flaky (may be retried)",
+]
