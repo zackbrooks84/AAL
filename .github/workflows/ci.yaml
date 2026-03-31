@@ -25,5 +25,4 @@ jobs:
           pip install -e .
           pip install pytest
       - name: Tests
-        shell: bash
         run: pytest -q

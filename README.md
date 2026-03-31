@@ -13,15 +13,39 @@ Instead of one-shot red teaming, AAL measures how models and defenses learn unde
 
 ## Quick start
 
-AAL supports Python 3.10–3.13. Continuous integration tests run on Ubuntu and on Windows using Git Bash.
+AAL supports Python 3.10–3.13. Continuous integration tests run on Ubuntu and Windows natively (no Git Bash required).
 
-```bash
-python -m venv .venv && . .venv/bin/activate
+**Windows (cmd):**
+```cmd
+python -m venv .venv && .venv\Scripts\activate.bat
 pip install -U pip pytest
-python -m aal.cli run --rounds 20 --adversary bandit --defender self_reflect --model dummy --out ./runs/run1
-python -m aal.cli report --in ./runs/run1/trajectory.jsonl
+pip install -e .
+aal run --rounds 20 --adversary bandit --defender self_reflect --model dummy --out ./runs/run1
+aal report --in ./runs/run1
 pytest -q
 ```
+
+**Windows (PowerShell):**
+```powershell
+python -m venv .venv && .venv\Scripts\Activate.ps1
+pip install -U pip pytest
+pip install -e .
+aal run --rounds 20 --adversary bandit --defender self_reflect --model dummy --out ./runs/run1
+aal report --in ./runs/run1
+pytest -q
+```
+
+**Linux / macOS:**
+```bash
+python -m venv .venv && source .venv/bin/activate
+pip install -U pip pytest
+pip install -e .
+aal run --rounds 20 --adversary bandit --defender self_reflect --model dummy --out ./runs/run1
+aal report --in ./runs/run1
+pytest -q
+```
+
+You can also run via `python -m aal.cli` without installing. Pass `--config examples/configs/quick.yaml` to load parameters from a file (CLI args override config values).
 
 ## Concepts
 
