@@ -44,11 +44,47 @@ aal report --in ./runs/smoke
 
 ## Running against real models
 
-Set your API key as an environment variable, then run:
+Set your API key as an environment variable, then run. Each provider uses its own key:
 
+**Windows (cmd):**
 ```cmd
+set ANTHROPIC_API_KEY=your_key_here
+aal run --rounds 50 --model claude --out ./runs/claude-haiku
+
 set GROQ_API_KEY=your_key_here
 aal run --rounds 50 --model groq --out ./runs/groq
+
+set MISTRAL_API_KEY=your_key_here
+aal run --rounds 50 --model mistral --out ./runs/mistral
+
+set GEMINI_API_KEY=your_key_here
+aal run --rounds 50 --model gemini --out ./runs/gemini
+
+set OPENAI_API_KEY=your_key_here
+aal run --rounds 50 --model openai --out ./runs/openai
+
+set XAI_API_KEY=your_key_here
+aal run --rounds 50 --model grok --out ./runs/grok
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:ANTHROPIC_API_KEY='your_key_here'
+$env:GROQ_API_KEY='your_key_here'
+# etc.
+```
+
+**Linux / macOS:**
+```bash
+export ANTHROPIC_API_KEY=your_key_here
+export GROQ_API_KEY=your_key_here
+# etc.
+```
+
+To run a specific Claude model by ID:
+```cmd
+aal run --rounds 50 --model claude-sonnet-4-6 --out ./runs/claude-sonnet
+aal run --rounds 50 --model claude-opus-4-6 --out ./runs/claude-opus
 ```
 
 ### Supported models
