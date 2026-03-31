@@ -1,97 +1,151 @@
 # Adaptive Adversarial Looping (AAL)
 
-AAL is a research-grade evaluation harness that pits an adaptive adversary against a learning defender across repeated rounds. 
-Instead of one-shot red teaming, AAL measures how models and defenses learn under attack and how quickly vulnerabilities decay.
+AAL is a research-grade evaluation harness that pits an adaptive adversary against a learning defender across repeated rounds. Instead of one-shot red teaming, AAL measures how models and defenses *learn under attack* — tracking breach rates, resilience decay, and ELO over time across any model you can call via API.
 
-**Why it is new**
-- Adversary adapts based on the last defense and its own regret signal.
-- Defender can update within the loop to reduce breach success across rounds.
-- Metrics focus on *learning under pressure*: resilience half-life, defense delta, and regret-conditioned ELO for adversaries and defenses.
-- Produces a public trajectory dataset of attack-defense rounds for reproducible science.
+**Why it's different**
+- Adversary adapts using a multi-armed bandit (Thompson sampling, 9 attack operators) — it learns what works against each model.
+- Defender updates its prompt strategy based on previous failures.
+- Metrics focus on dynamics, not snapshots: resilience half-life, defense delta, regret-conditioned ELO.
+- Produces a reproducible JSONL trajectory for every run — full attack/defense/output history.
 
-> Safe by design: default tasks are harmless simulators that never request real harm. You can plug in your own tasks and safety policies later if needed.
+> **Safe by design:** default tasks are harmless secret-classification simulators. No real harmful content is generated or requested.
+
+---
 
 ## Quick start
 
-AAL supports Python 3.10–3.13. Continuous integration tests run on Ubuntu and Windows natively (no Git Bash required).
+Requires Python 3.10–3.13. No Git Bash required — runs natively on Windows cmd, PowerShell, Linux, and macOS.
 
 **Windows (cmd):**
 ```cmd
 python -m venv .venv && .venv\Scripts\activate.bat
-pip install -U pip pytest
-pip install -e .
-aal run --rounds 20 --adversary bandit --defender self_reflect --model dummy --out ./runs/run1
-aal report --in ./runs/run1
-pytest -q
+pip install -U pip && pip install -e .
+aal run --rounds 20 --model dummy --out ./runs/smoke
+aal report --in ./runs/smoke
 ```
 
 **Windows (PowerShell):**
 ```powershell
 python -m venv .venv && .venv\Scripts\Activate.ps1
-pip install -U pip pytest
-pip install -e .
-aal run --rounds 20 --adversary bandit --defender self_reflect --model dummy --out ./runs/run1
-aal report --in ./runs/run1
-pytest -q
+pip install -U pip && pip install -e .
+aal run --rounds 20 --model dummy --out ./runs/smoke
+aal report --in ./runs/smoke
 ```
 
 **Linux / macOS:**
 ```bash
 python -m venv .venv && source .venv/bin/activate
-pip install -U pip pytest
-pip install -e .
-aal run --rounds 20 --adversary bandit --defender self_reflect --model dummy --out ./runs/run1
-aal report --in ./runs/run1
-pytest -q
+pip install -U pip && pip install -e .
+aal run --rounds 20 --model dummy --out ./runs/smoke
+aal report --in ./runs/smoke
 ```
 
-You can also run via `python -m aal.cli` without installing. Pass `--config examples/configs/quick.yaml` to load parameters from a file (CLI args override config values).
+---
+
+## Running against real models
+
+Set your API key as an environment variable, then run:
+
+```cmd
+set GROQ_API_KEY=your_key_here
+aal run --rounds 50 --model groq --out ./runs/groq
+```
+
+### Supported models
+
+| Alias | Provider | Model | Key env var |
+|-------|----------|-------|-------------|
+| `dummy` | Local | No API call | — |
+| `claude` | Anthropic | Claude Haiku 4.5 | `ANTHROPIC_API_KEY` |
+| `claude-<model-id>` | Anthropic | Any Claude model | `ANTHROPIC_API_KEY` |
+| `groq` | Groq | Llama 3.1 8B | `GROQ_API_KEY` |
+| `groq-llama-70b` | Groq | Llama 3.3 70B | `GROQ_API_KEY` |
+| `groq-qwen` | Groq | Qwen3 32B | `GROQ_API_KEY` |
+| `groq-llama4` | Groq | Llama 4 Scout 17B | `GROQ_API_KEY` |
+| `groq-gpt-20b` | Groq | GPT-OSS 20B | `GROQ_API_KEY` |
+| `groq-gpt-120b` | Groq | GPT-OSS 120B | `GROQ_API_KEY` |
+| `mistral` | Mistral | Mistral Small | `MISTRAL_API_KEY` |
+| `mistral-medium` | Mistral | Mistral Medium | `MISTRAL_API_KEY` |
+| `mistral-large` | Mistral | Mistral Large | `MISTRAL_API_KEY` |
+| `gemini` | Google | Gemini 2.5 Flash | `GEMINI_API_KEY` |
+| `openai` | OpenAI | GPT-4.1 Nano | `OPENAI_API_KEY` |
+| `openai-mini` | OpenAI | GPT-4o Mini | `OPENAI_API_KEY` |
+| `openai-4o` | OpenAI | GPT-4o | `OPENAI_API_KEY` |
+| `grok` | xAI | Grok 3 Mini | `XAI_API_KEY` |
+| `grok-3` | xAI | Grok 3 | `XAI_API_KEY` |
+| `deepseek` | DeepSeek | DeepSeek Chat | `DEEPSEEK_API_KEY` |
+| `openrouter` | OpenRouter | Llama 3.3 70B (free) | `OPENROUTER_API_KEY` |
+| `or-deepseek` | OpenRouter | DeepSeek R1 (free) | `OPENROUTER_API_KEY` |
+| `or-gemma` | OpenRouter | Gemma 3 27B (free) | `OPENROUTER_API_KEY` |
+
+---
+
+## Commands
+
+```cmd
+# Run a loop
+aal run --rounds 50 --model groq --out ./runs/groq
+
+# Use a config file (CLI args override)
+aal run --config examples/configs/quick.yaml --rounds 50
+
+# View results
+aal report --in ./runs/groq
+aal dashboard --in ./runs/groq
+aal leaderboard ./runs
+aal leaderboard ./runs --last 50    # trim if a run was repeated to same folder
+aal compare ./runs/groq ./runs/mistral
+
+# Generate visual report (requires matplotlib, numpy)
+python make_report.py               # outputs runs/aal_report.png
+```
+
+---
 
 ## Concepts
 
-- **Loop**: repeated rounds where adversary proposes an attack, defender wraps a user task prompt, model responds, and a scorer assesses success.
-- **Adaptive adversary**: multi-armed bandit chooses attack operators based on rewards.
-- **Learning defender**: configurable strategies such as self-reflection that update prompts based on previous failures.
-- **Metrics**: success rate over time, resilience half-life, defense delta, ELO rating for both sides.
+**Loop** — repeated rounds where the adversary proposes an attack, the defender wraps the prompt, the model responds, and a scorer assesses whether the defense held.
+
+**Adaptive adversary** — Thompson-sampling bandit with 9 operators: translation twist, role confusion, encoding noise, flattery anchor, persona hijack, nested roleplay, authority escalation, context overflow, hypothetical frame. Allocates more attempts to operators that are working.
+
+**Learning defender** — self-reflection strategy that updates the defense prompt based on breach history.
+
+**Metrics**
+- **Breach rate** — fraction of rounds where the adversary succeeded.
+- **Resilience half-life** — rounds needed for breach rate to drop by half after a defense update.
+- **Defense delta** — estimated true learning from replaying earlier prompts with the current defense.
+- **ELO** — both sides receive ratings updated each round; high defender ELO means the model held under sustained pressure.
+
+---
 
 ## Repository layout
 
 ```
 aal/
-  core/loop.py            - main tournament engine
-  core/types.py           - dataclasses for steps and configs
-  adversaries/            - adversary policies (bandit baseline included)
-  defenders/              - defender policies (self-reflection baseline included)
-  models/                 - provider interfaces and dummy model for tests
-  metrics/                - success metrics, ELO, learning curves
-  logging_utils/          - event logging and pretty printing
-  storage/                - JSONL trajectory writer and schema
-  safety/                 - simple content policy stubs
-  cli.py                  - Typer-like CLI implemented with argparse
-examples/
-  configs/quick.yaml      - example config
+  adversaries/          — attack policies (bandit baseline)
+  core/                 — loop engine and types
+  defenders/            — defense policies (self-reflection baseline)
+  metrics/              — breach rate, half-life, delta, ELO
+  models/               — provider adapters (Claude, Groq, Mistral, Gemini, OpenAI, Grok, DeepSeek, OpenRouter)
+  safety/               — scorer and content policy
+  storage/              — JSONL trajectory writer
+  cli.py                — command-line interface
+examples/configs/       — example YAML configs
+make_report.py          — multi-panel visual report generator
 tests/
-  test_loop.py
-  test_bandit.py
 docs/
-  design.md
-  metrics.md
-.github/workflows/ci.yaml
-pyproject.toml
-LICENSE
-CONTRIBUTING.md
-CODE_OF_CONDUCT.md
-SECURITY.md
-CITATION.cff
 ```
 
-## Metrics sketch
+---
 
-- **Success rate t**: fraction of rounds breached at step t.
-- **Resilience half-life**: rounds needed for success rate to drop by half after a new defense update.
-- **Defense delta**: counterfactual replays of earlier prompts with current defense to estimate true learning.
-- **ELO**: adversaries and defenses receive ratings based on outcomes across many loops.
+## Running tests
+
+```cmd
+pytest -q
+```
+
+---
 
 ## Cite
 
-If this repository helps your research, please cite using `CITATION.cff`.
+If this work helps your research, please cite using `CITATION.cff`.
