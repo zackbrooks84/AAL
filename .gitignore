@@ -208,3 +208,6 @@ __marimo__/
 
 # AAL run output
 runs/
+
+# pytest-benchmark
+.benchmarks/
