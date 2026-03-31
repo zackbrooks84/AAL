@@ -101,6 +101,13 @@ _OPENAI_MODELS = {
     "openai-4o":         "gpt-4o",
 }
 
+_GROK_MODELS = {
+    "grok":              "grok-3-mini",
+    "grok-mini":         "grok-3-mini",
+    "grok-3":            "grok-3",
+    "grok-2":            "grok-2",
+}
+
 # API keys — set via environment variables (see README for instructions)
 # These are empty by default; env vars always take precedence
 _GROQ_API_KEY       = os.environ.get("GROQ_API_KEY", "")
@@ -109,19 +116,31 @@ _DEEPSEEK_API_KEY   = os.environ.get("DEEPSEEK_API_KEY", "")
 _GEMINI_API_KEY     = os.environ.get("GEMINI_API_KEY", "")
 _OPENROUTER_API_KEY = os.environ.get("OPENROUTER_API_KEY", "")
 _OPENAI_API_KEY     = os.environ.get("OPENAI_API_KEY", "")
+_GROK_API_KEY       = os.environ.get("XAI_API_KEY", "")
+_ANTHROPIC_API_KEY  = os.environ.get("ANTHROPIC_API_KEY", "")
 
 
 def _load_model(model_name: str, **kwargs):
     if model_name == "dummy":
         return DummyModel()
 
-    # Claude
+    # Claude (Anthropic) — uses ANTHROPIC_API_KEY
     if model_name in ("claude", "claude-haiku", "haiku"):
         from .models.claude_api import ClaudeModel
-        return ClaudeModel(model_id="claude-haiku-4-5-20251001")
+        return ClaudeModel(model_id="claude-haiku-4-5-20251001", api_key=_ANTHROPIC_API_KEY or None)
     if model_name.startswith("claude-"):
         from .models.claude_api import ClaudeModel
-        return ClaudeModel(model_id=model_name)
+        return ClaudeModel(model_id=model_name, api_key=_ANTHROPIC_API_KEY or None)
+
+    # Grok (xAI) — uses XAI_API_KEY
+    if model_name in _GROK_MODELS or model_name.startswith("grok-"):
+        from .models.openai_compat import OpenAICompatModel
+        model_id = _GROK_MODELS.get(model_name, model_name)
+        return OpenAICompatModel(
+            api_key=_GROK_API_KEY,
+            model_id=model_id,
+            base_url="https://api.x.ai/v1",
+        )
 
     # Groq
     if model_name in _GROQ_MODELS or model_name.startswith("groq-"):

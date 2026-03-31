@@ -32,6 +32,10 @@ KNOWN_RUNS = {
     "openrouter":       {"label": "OpenRouter Llama 70B", "color": "#ff9800"},  # amber
     "openai":           {"label": "OpenAI GPT-4.1 Nano",  "color": "#b0bec5"},  # silver
     "openai-mini":      {"label": "OpenAI GPT-4o Mini",   "color": "#ecf0f1"},  # white
+    "openai-4o":        {"label": "OpenAI GPT-4o",        "color": "#ffffff"},  # bright white
+    "grok":             {"label": "Grok 3 Mini",          "color": "#a78bfa"},  # violet
+    "grok-3":           {"label": "Grok 3",               "color": "#7c3aed"},  # deep violet
+    "grok-2":           {"label": "Grok 2",               "color": "#c4b5fd"},  # light violet
 }
 
 # Fallback palette for any run folder not in KNOWN_RUNS
