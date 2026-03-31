@@ -60,6 +60,7 @@ _MISTRAL_MODELS = {
     "mistral-small":    "mistral-small-latest",
     "mistral-medium":   "mistral-medium-latest",
     "mistral-large":    "mistral-large-latest",
+    "mistral-codestral":"codestral-latest",
 }
 
 def _require_env(var: str, model: str) -> str:
@@ -84,6 +85,7 @@ _GEMINI_MODELS = {
     "gemini-flash":      "gemini-2.5-flash",
     "gemini-flash-lite": "gemini-2.5-flash-lite",
     "gemini-pro":        "gemini-2.5-pro",
+    "gemini-ultra":      "gemini-2.5-ultra",
 }
 
 _OPENROUTER_MODELS = {
@@ -99,6 +101,9 @@ _OPENAI_MODELS = {
     "openai-nano":       "gpt-4.1-nano",
     "openai-mini":       "gpt-4o-mini",
     "openai-4o":         "gpt-4o",
+    "openai-4.1":        "gpt-4.1",
+    "openai-5":          "gpt-5",
+    "openai-5-mini":     "gpt-5-mini",
 }
 
 _GROK_MODELS = {
@@ -106,6 +111,13 @@ _GROK_MODELS = {
     "grok-mini":         "grok-3-mini",
     "grok-3":            "grok-3",
     "grok-2":            "grok-2",
+}
+
+_CLAUDE_MODELS = {
+    "claude":            "claude-haiku-4-5-20251001",
+    "claude-haiku":      "claude-haiku-4-5-20251001",
+    "claude-sonnet":     "claude-sonnet-4-6",
+    "claude-opus":       "claude-opus-4-6",
 }
 
 # API keys — set via environment variables (see README for instructions)
@@ -125,12 +137,10 @@ def _load_model(model_name: str, **kwargs):
         return DummyModel()
 
     # Claude (Anthropic) — uses ANTHROPIC_API_KEY
-    if model_name in ("claude", "claude-haiku", "haiku"):
+    if model_name in _CLAUDE_MODELS or model_name in ("haiku",) or model_name.startswith("claude-"):
         from .models.claude_api import ClaudeModel
-        return ClaudeModel(model_id="claude-haiku-4-5-20251001", api_key=_ANTHROPIC_API_KEY or None)
-    if model_name.startswith("claude-"):
-        from .models.claude_api import ClaudeModel
-        return ClaudeModel(model_id=model_name, api_key=_ANTHROPIC_API_KEY or None)
+        model_id = _CLAUDE_MODELS.get(model_name, model_name)
+        return ClaudeModel(model_id=model_id, api_key=_ANTHROPIC_API_KEY or None)
 
     # Grok (xAI) — uses XAI_API_KEY
     if model_name in _GROK_MODELS or model_name.startswith("grok-"):

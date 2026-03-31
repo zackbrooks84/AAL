@@ -92,27 +92,47 @@ aal run --rounds 50 --model claude-opus-4-6 --out ./runs/claude-opus
 | Alias | Provider | Model | Key env var |
 |-------|----------|-------|-------------|
 | `dummy` | Local | No API call | — |
-| `claude` | Anthropic | Claude Haiku 4.5 | `ANTHROPIC_API_KEY` |
-| `claude-<model-id>` | Anthropic | Any Claude model | `ANTHROPIC_API_KEY` |
+| **Anthropic** | | | |
+| `claude` / `claude-haiku` | Anthropic | Claude Haiku 4.5 | `ANTHROPIC_API_KEY` |
+| `claude-sonnet` | Anthropic | Claude Sonnet 4.6 | `ANTHROPIC_API_KEY` |
+| `claude-opus` | Anthropic | Claude Opus 4.6 | `ANTHROPIC_API_KEY` |
+| `claude-<model-id>` | Anthropic | Any Claude model by ID | `ANTHROPIC_API_KEY` |
+| **Groq** | | | |
 | `groq` | Groq | Llama 3.1 8B | `GROQ_API_KEY` |
 | `groq-llama-70b` | Groq | Llama 3.3 70B | `GROQ_API_KEY` |
 | `groq-qwen` | Groq | Qwen3 32B | `GROQ_API_KEY` |
 | `groq-llama4` | Groq | Llama 4 Scout 17B | `GROQ_API_KEY` |
 | `groq-gpt-20b` | Groq | GPT-OSS 20B | `GROQ_API_KEY` |
 | `groq-gpt-120b` | Groq | GPT-OSS 120B | `GROQ_API_KEY` |
+| **Mistral** | | | |
 | `mistral` | Mistral | Mistral Small | `MISTRAL_API_KEY` |
 | `mistral-medium` | Mistral | Mistral Medium | `MISTRAL_API_KEY` |
 | `mistral-large` | Mistral | Mistral Large | `MISTRAL_API_KEY` |
-| `gemini` | Google | Gemini 2.5 Flash | `GEMINI_API_KEY` |
-| `openai` | OpenAI | GPT-4.1 Nano | `OPENAI_API_KEY` |
+| `mistral-codestral` | Mistral | Codestral | `MISTRAL_API_KEY` |
+| **Google** | | | |
+| `gemini` / `gemini-flash` | Google | Gemini 2.5 Flash | `GEMINI_API_KEY` |
+| `gemini-flash-lite` | Google | Gemini 2.5 Flash Lite | `GEMINI_API_KEY` |
+| `gemini-pro` | Google | Gemini 2.5 Pro | `GEMINI_API_KEY` |
+| `gemini-ultra` | Google | Gemini 2.5 Ultra | `GEMINI_API_KEY` |
+| **OpenAI** | | | |
+| `openai` / `openai-nano` | OpenAI | GPT-4.1 Nano | `OPENAI_API_KEY` |
 | `openai-mini` | OpenAI | GPT-4o Mini | `OPENAI_API_KEY` |
 | `openai-4o` | OpenAI | GPT-4o | `OPENAI_API_KEY` |
-| `grok` | xAI | Grok 3 Mini | `XAI_API_KEY` |
+| `openai-4.1` | OpenAI | GPT-4.1 | `OPENAI_API_KEY` |
+| `openai-5-mini` | OpenAI | GPT-5 Mini | `OPENAI_API_KEY` |
+| `openai-5` | OpenAI | GPT-5 | `OPENAI_API_KEY` |
+| **xAI** | | | |
+| `grok` / `grok-mini` | xAI | Grok 3 Mini | `XAI_API_KEY` |
 | `grok-3` | xAI | Grok 3 | `XAI_API_KEY` |
+| `grok-2` | xAI | Grok 2 | `XAI_API_KEY` |
+| **DeepSeek** | | | |
 | `deepseek` | DeepSeek | DeepSeek Chat | `DEEPSEEK_API_KEY` |
-| `openrouter` | OpenRouter | Llama 3.3 70B (free) | `OPENROUTER_API_KEY` |
-| `or-deepseek` | OpenRouter | DeepSeek R1 (free) | `OPENROUTER_API_KEY` |
-| `or-gemma` | OpenRouter | Gemma 3 27B (free) | `OPENROUTER_API_KEY` |
+| `deepseek-reasoner` | DeepSeek | DeepSeek Reasoner | `DEEPSEEK_API_KEY` |
+| **OpenRouter (free tier)** | | | |
+| `openrouter` / `or-llama` | OpenRouter | Llama 3.3 70B | `OPENROUTER_API_KEY` |
+| `or-deepseek` | OpenRouter | DeepSeek R1 | `OPENROUTER_API_KEY` |
+| `or-gemma` | OpenRouter | Gemma 3 27B | `OPENROUTER_API_KEY` |
+| `or-qwen` | OpenRouter | Qwen3 80B | `OPENROUTER_API_KEY` |
 
 ---
 
